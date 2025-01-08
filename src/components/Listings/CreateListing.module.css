@@ -1,0 +1,15 @@
+.modal {
+
+}
+
+.container {
+    width: 60vw;
+    box-sizing: border-box;
+    padding: 10px 30px;
+}
+
+.mealsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px
+}
