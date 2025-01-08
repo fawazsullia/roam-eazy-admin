@@ -5,6 +5,7 @@ import AdminPackageList from "core/packageList/PackageList";
 import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
+import { axiosInstance } from "utils/axios.util";
 
 const Listings = () => {
     const auth = useSelector(state => state.auth);
@@ -32,7 +33,7 @@ const Listings = () => {
         }
 
         try {
-            const response = await axios.post('/api/listing/get-listings', queryObj);
+            const response = await axiosInstance.post('/api/listing/get-listings', queryObj);
             setListings(response.data.listings);
             setTotalPackages(response.data.total);
         } catch (error) {

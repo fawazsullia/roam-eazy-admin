@@ -6,6 +6,7 @@ import Styles from "./CreateListing.module.css";
 import "antd/dist/reset.css";
 import { Meals } from 'constants/meals.constant';
 import "../../index.scss"
+import { axiosInstance } from 'utils/axios.util';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -19,11 +20,11 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
     const [submitLoading, setSubmitLoading] = useState(false);
 
     useEffect(() => {
-        axios.post('/api/place/get-departing', { limit: 100, offset: 0 })
+        axiosInstance.post('/api/place/get-departing', { limit: 100, offset: 0 })
             .then(response => setFrom(response.data))
             .catch(error => console.error(error));
 
-        axios.post('/api/place/get-destination', { limit: 100, offset: 0, type: "country" })
+        axiosInstance.post('/api/place/get-destination', { limit: 100, offset: 0, type: "country" })
             .then(response => { setTo(response.data); setSelectedTo(response.data[0].placeId) })
             .catch(error => console.error(error));
         return () => {
@@ -38,7 +39,7 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
 
     useEffect(() => {
         if (selectedTo) {
-            axios.post('/api/place/get-destination', { limit: 100, offset: 0, country: selectedTo, type: "city" })
+            axiosInstance.post('/api/place/get-destination', { limit: 100, offset: 0, country: selectedTo, type: "city" })
                 .then(response => setPlaces(response.data))
                 .catch(error => console.error(error));
 
