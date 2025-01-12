@@ -1,4 +1,6 @@
+import { Spin } from "antd";
 import axios from "axios";
+import FullPageSpin from "components/FullPageSpin/FullPageSpin";
 import CreateListingForm from "components/Listings/CreateListing";
 import PackageList from "components/Listings/PackageLists";
 import AdminPackageList from "core/packageList/PackageList";
@@ -13,7 +15,7 @@ const Listings = () => {
     const [totalPackages, setTotalPackages] = useState(0);
     const [skip, setSkip] = useState(0);
     const [showAddListing, setShowAddListing] = useState(false);
-    console.log(auth, "..........................//////////////////");
+    const [listingLoading, setListingLoading] = useState(false);
 
     const limit = 6;
 
@@ -31,7 +33,7 @@ const Listings = () => {
         } else {
             queryObj.company = auth.user.companyId.toString();
         }
-
+        setListingLoading(true);
         try {
             const response = await axiosInstance.post('/api/listing/get-listings', queryObj);
             setListings(response.data.listings);
@@ -39,34 +41,38 @@ const Listings = () => {
         } catch (error) {
             console.log(error);
         }
+        setListingLoading(false);
     }
 
     useEffect(() => {
         fetchListings();
     }, [skip]);
 
-    if(auth.user?.role === "admin" || auth.user?.role === "user") {
+    if(listingLoading) {
+        return <FullPageSpin />
+    }
+
+    if (auth.user?.role === "admin" || auth.user?.role === "user") {
         return <>
-        <PackageList
-            packages={listings}
-            totalPackages={totalPackages}
-            limit={limit}
-            skip={skip}
-            onPageChange={handlePageChange}
-            openAddListing={() => setShowAddListing(true)}
-        />
-        <CreateListingForm show={showAddListing} setShowAddListing={setShowAddListing} />
-    </>
+            <PackageList
+                packages={listings}
+                totalPackages={totalPackages}
+                limit={limit}
+                skip={skip}
+                onPageChange={handlePageChange}
+                openAddListing={() => setShowAddListing(true)}
+            />
+            <CreateListingForm show={showAddListing} setShowAddListing={setShowAddListing} />
+        </>
     } else {
         return <>
-         <AdminPackageList 
-            packages={listings}
-            totalPackages={totalPackages}
-            limit={limit}
-            skip={skip}
-            onPageChange={handlePageChange}
-            openAddListing={() => setShowAddListing(true)}
-         />
+            <AdminPackageList
+                packages={listings}
+                totalPackages={totalPackages}
+                limit={limit}
+                skip={skip}
+                onPageChange={handlePageChange}
+            />
         </>
     }
 }

@@ -36,6 +36,18 @@ export const verifyLogin = createAsyncThunk(
     }
 );
 
+export const logoutUser = createAsyncThunk(
+    'user/logout',
+    async (arg, thunkAPI) => {
+        try {
+            await axiosInstance.get('/api/user/logout');
+            return null;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+    }
+);
+
 const userSliece = createSlice({
     name: 'user',
     initialState,
@@ -69,6 +81,18 @@ const userSliece = createSlice({
                 state.isLoggedIn = true;
             })
             .addCase(verifyLogin.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            .addCase(logoutUser.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.isLoading = false;
+                state.isLoggedIn = false;
+                state.user = null;
+            })
+            .addCase(logoutUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });

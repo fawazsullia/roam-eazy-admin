@@ -51,7 +51,6 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
         const formData = new FormData();
 
         const values = form.getFieldsValue();
-        console.log(values, "values========================>");
         Object.entries(values).forEach(([key, value]) => {
             if (key === 'files' && value[0]) {
                 formData.append(key, value[0].originFileObj);
@@ -59,23 +58,39 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                 value.forEach((item, index) => {
                     formData.append(`itinerary[${index}][day]`, item.day);
                     formData.append(`itinerary[${index}][title]`, item.title);
-                    formData.append(`itinerary[${index}][description][0]`, item.description);
+                    if (item.descriptions.length) {
+                        item.descriptions.forEach((desc, i) => {
+                            if (i > 0) {
+                                formData.append(`itinerary[${index}][description][${i}]`, desc);
+                            }
+                        });
+                    }
                 });
             } else if (key === "termsAndConditions") {
                 value.forEach((item, index) => {
                     formData.append(`termsAndConditions[${index}]`, item);
                 });
-            } else if(key === "mealsIncluded" && Array.isArray(value) && value.length) {
+            } else if (key === "mealsIncluded" && Array.isArray(value) && value.length) {
                 value.forEach((meal, index) => {
                     formData.append(`mealsIncluded[${index}]`, meal);
                 });
-            } else if(key === "includedPlaces") {
+            } else if (key === "includedPlaces") {
                 value.forEach((place, index) => {
                     formData.append(`includedPlaces[${index}]`, place);
                 });
-            } else if(key === "tags") {
+            } else if (key === "tags") {
                 value?.forEach((tag, index) => {
                     formData.append(`tags[${index}]`, tag);
+                });
+            } else if (key === "customInclusions") {
+                value?.forEach((customInclusion, index) => {
+                    if (!customInclusions) return;
+                    formData.append(`customInclusions[${index}]`, customInclusion);
+                });
+            } else if (key === "customExclusions") {
+                value?.forEach((customExclusion, index) => {
+                    if (!customExclusions) return;
+                    formData.append(`customExclusions[${index}]`, customExclusion);
                 });
             } else {
                 formData.append(key, value);
@@ -83,7 +98,7 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
         });
 
         try {
-            await axios.post('/api/listing/create-listing', formData);
+            await axios.post('/api/listing', formData);
             setShowAddListing(false);
             form.resetFields();
         } catch (error) {
@@ -202,11 +217,65 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                     <Select>
                         <Option value="ARRIVAL_ONLY">Arrival Only</Option>
                         <Option value="DEPARTURE_ONLY">Departure Only</Option>
-                        <Option value="BOTH">Both</Option>
+                        <Option value="TWO_WAY">Both</Option>
                     </Select>
                 </Form.Item>
 
-                <Form.List name="itinerary" initialValue={[{ day: '', title: '', description: '' }]}>
+                <Form.List name="customInclusions" initialValue={[]}>
+                    {(fields, { add, remove }) => (
+                        <>
+                            <h4>Custom Inclusions</h4>
+                            {fields.map(({ name }) => (
+                                <>
+                                    <Row gutter={16}>
+                                        <Col span={20}>
+                                            <Form.Item name={[name]}>
+                                                <TextArea placeholder="Inclusion" />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={2}>
+                                            <Button type="dashed" danger onClick={() => remove(name)} icon={<MinusCircleOutlined />} />
+                                        </Col>
+                                    </Row>
+                                </>
+                            ))}
+                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                Add
+                            </Button>
+                        </>
+                    )}
+                </Form.List>
+                <br />
+                <br />
+
+                <Form.List name="customExclusions" initialValue={[]}>
+                    {(fields, { add, remove }) => (
+                        <>
+                            <h4>Custom Exclusions</h4>
+                            {fields.map(({ name }) => (
+                                <>
+                                    <Row gutter={16}>
+                                        <Col span={20}>
+                                            <Form.Item name={[name]}>
+                                                <TextArea placeholder="Exclusion" />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={2}>
+                                            <Button type="dashed" danger onClick={() => remove(name)} icon={<MinusCircleOutlined />} />
+                                        </Col>
+                                    </Row>
+                                </>
+                            ))}
+                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                Add
+                            </Button>
+                        </>
+                    )}
+                </Form.List>
+                <br />
+                <br />
+
+                {/* <Form.List name="itinerary" initialValue={[{ day: '', title: '', description: '' }]}>
                     {(fields, { add, remove }) => (
                         <>
                             <h4>Itinerary</h4>
@@ -242,7 +311,98 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                             </Button>
                         </>
                     )}
+                </Form.List> */}
+
+                <Form.List name="itinerary" initialValue={[{ day: 1, title: '', descriptions: [''] }]} className={Styles.itinerary}>
+                    {(fields, { add, remove }) => (
+                        <>
+                            <h4>Itinerary</h4>
+                            {fields.map(({ key, name, fieldKey }) => (
+                                <div key={key} className={Styles.itineraryBlock}>
+                                    <Row gutter={16}>
+                                        <Col span={6}>
+                                            <Form.Item
+                                                name={[name, 'day']}
+                                                fieldKey={[fieldKey, 'day']}
+                                                rules={[{ required: true, message: 'Day is required' }]}
+                                            >
+                                                <InputNumber min={1} placeholder="Day" />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={16}>
+                                            <Form.Item
+                                                name={[name, 'title']}
+                                                fieldKey={[fieldKey, 'title']}
+                                                rules={[{ required: true, message: 'Title is required' }]}
+                                            >
+                                                <Input placeholder="Title" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+
+                                    {/* Nested Form.List for descriptions */}
+                                    <Form.List name={[name, 'descriptions']} initialValue={['']}>
+                                        {(descFields, { add: addDesc, remove: removeDesc }) => (
+                                            <>
+                                                <h5>Descriptions</h5>
+                                                {descFields.map(({ key: descKey, name: descName, fieldKey: descFieldKey }) => (
+                                                    <Row key={descKey} gutter={16}>
+                                                        <Col span={18}>
+                                                            <Form.Item
+                                                                name={descName}
+                                                                fieldKey={descFieldKey}
+                                                                rules={[{ required: true, message: 'Description is required' }]}
+                                                            >
+                                                                <TextArea placeholder="Description" rows={1} />
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col span={4}>
+                                                            <Button
+                                                                type="dashed"
+                                                                danger
+                                                                onClick={() => removeDesc(descName)}
+                                                                icon={<MinusCircleOutlined />}
+                                                            />
+                                                            <Button type="dashed" onClick={() => addDesc()} icon={<PlusOutlined />} />
+                                                        </Col>
+                                                    </Row>
+                                                ))}
+
+                                            </>
+                                        )}
+                                    </Form.List>
+
+                                    <Row justify="end">
+                                        <Button
+                                            type="dashed"
+                                            danger
+                                            onClick={() => remove(name)}
+                                            icon={<MinusCircleOutlined />}
+                                        >
+                                            Remove Itinerary
+                                        </Button>
+                                    </Row>
+                                </div>
+                            ))}
+
+                            <Button
+                                type="dashed"
+                                onClick={() =>
+                                    add({
+                                        day: fields.length > 0 ? fields[fields.length - 1].name.day + 1 : 1,
+                                        title: '',
+                                        descriptions: [''],
+                                    })
+                                }
+                                block
+                                icon={<PlusOutlined />}
+                            >
+                                Add Itinerary
+                            </Button>
+                        </>
+                    )}
                 </Form.List>
+
                 <br />
                 <br />
 
@@ -314,7 +474,7 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                     </Button>
                 </Form.Item>
             </Form>
-        </Modal>
+        </Modal >
     );
 };
 

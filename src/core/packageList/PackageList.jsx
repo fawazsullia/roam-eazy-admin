@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Container, Row, Col, Form, Button, Card, Pagination, Badge } from "react-bootstrap";
 import dayjs from "dayjs";
 
-const AdminPackageList = ({ packages, totalPackages, limit, skip, onPageChange, openAddListing }) => {
+const AdminPackageList = ({ packages, totalPackages, limit, skip, onPageChange }) => {
   const [filters, setFilters] = useState({ search: "", category: "" });
 
   const handleFilterChange = (e) => {
@@ -48,9 +48,6 @@ const AdminPackageList = ({ packages, totalPackages, limit, skip, onPageChange, 
             </Row>
           </Form>
         </Col>
-        <Col md={4} className="text-end">
-          <Button variant="primary" onClick={() => openAddListing()}>Create Listing</Button>
-        </Col>
       </Row>
 
       {/* Package List */}
@@ -87,7 +84,7 @@ const AdminPackageList = ({ packages, totalPackages, limit, skip, onPageChange, 
                       )}
                     </Card.Text>
                     <Card.Text>
-                      <strong>Budget:</strong> ${pkg.basePrice || 0} - ${pkg.basePriceSingle || "Unlimited"}
+                      <strong>Budget:</strong> AED {pkg.basePrice || 0} - AED {pkg.basePriceSingle || "Unlimited"}
                     </Card.Text>
                     <Card.Text>
                       <strong>Flight Included:</strong> {pkg.isFlightIncluded ? "Yes" : "No"}

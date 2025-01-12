@@ -13,8 +13,7 @@ const NavGroup = ({ layout, group }) => {
   if (group.children) {
     const groups = group.children;
     navItems = Object.keys(groups).map((item) => {
-      console.log(item, "item/////////");
-      if (item.forRoles && !item.forRoles.includes(role)) {
+      if (groups[Number(item)].forRoles && !groups[Number(item)].forRoles.includes(role)) {
         return false;
       }
       item = groups[item];

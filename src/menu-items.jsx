@@ -28,6 +28,14 @@ const menuItems = {
           icon: "feather icon-map",
           url: "/dashboard/places",
           forRoles: ['core', 'staff']
+        },
+        {
+          id: "companies",
+          title: "Companies",
+          type: "item",
+          icon: "feather icon-map",
+          url: "/dashboard/companies",
+          forRoles: ['core', 'staff']
         }
       ]
     },

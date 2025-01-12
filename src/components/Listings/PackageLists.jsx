@@ -87,7 +87,7 @@ const PackageList = ({ packages, totalPackages, limit, skip, onPageChange, openA
                       )}
                     </Card.Text>
                     <Card.Text>
-                      <strong>Budget:</strong> ${pkg.basePrice || 0} - ${pkg.basePriceSingle || "Unlimited"}
+                      <strong>Budget:</strong> AED {pkg.basePrice || 0} - AED {pkg.basePriceSingle || "Unlimited"}
                     </Card.Text>
                     <Card.Text>
                       <strong>Flight Included:</strong> {pkg.isFlightIncluded ? "Yes" : "No"}

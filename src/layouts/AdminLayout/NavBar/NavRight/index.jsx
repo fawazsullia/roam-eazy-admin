@@ -9,9 +9,12 @@ import avatar1 from '../../../../assets/images/user/avatar-1.jpg';
 import avatar2 from '../../../../assets/images/user/avatar-2.jpg';
 import avatar3 from '../../../../assets/images/user/avatar-3.jpg';
 import avatar4 from '../../../../assets/images/user/avatar-4.jpg';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from 'store/auth/authSlice';
 
 const NavRight = () => {
   const [listOpen, setListOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const notiData = [
     {
@@ -33,6 +36,10 @@ const NavRight = () => {
       activity: 'yesterday'
     }
   ];
+
+  const handleLogout = () => {
+    dispatch(logoutUser())
+  }
 
   return (
     <React.Fragment>
@@ -109,13 +116,6 @@ const NavRight = () => {
           </Dropdown>
         </ListGroup.Item>
         <ListGroup.Item as="li" bsPrefix=" ">
-          <Dropdown>
-            <Dropdown.Toggle as={Link} variant="link" to="#" className="displayChatbox" onClick={() => setListOpen(true)}>
-              <i className="icon feather icon-mail" />
-            </Dropdown.Toggle>
-          </Dropdown>
-        </ListGroup.Item>
-        <ListGroup.Item as="li" bsPrefix=" ">
           <Dropdown align={'end'} className="drp-user">
             <Dropdown.Toggle as={Link} variant="link" to="#" id="dropdown-basic">
               <i className="icon feather icon-settings" />
@@ -124,7 +124,7 @@ const NavRight = () => {
               <div className="pro-head">
                 <img src={avatar1} className="img-radius" alt="User Profile" />
                 <span>John Doe</span>
-                <Link to="#" className="dud-logout" title="Logout">
+                <Link to="#" className="dud-logout" title="Logout" onClick={() => handleLogout()}>
                   <i className="feather icon-log-out" />
                 </Link>
               </div>
