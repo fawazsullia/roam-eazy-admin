@@ -51,18 +51,19 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
         const formData = new FormData();
 
         const values = form.getFieldsValue();
+
         Object.entries(values).forEach(([key, value]) => {
-            if (key === 'files' && value[0]) {
-                formData.append(key, value[0].originFileObj);
+            if (key === 'files' && value?.length) {
+                value.forEach(file => {
+                    formData.append('files', file.originFileObj);
+                });
             } else if (key === 'itinerary') {
                 value.forEach((item, index) => {
                     formData.append(`itinerary[${index}][day]`, item.day);
                     formData.append(`itinerary[${index}][title]`, item.title);
-                    if (item.descriptions.length) {
-                        item.descriptions.forEach((desc, i) => {
-                            if (i > 0) {
+                    if (item.descriptions?.length) {
+                        item.descriptions?.forEach((desc, i) => {
                                 formData.append(`itinerary[${index}][description][${i}]`, desc);
-                            }
                         });
                     }
                 });
@@ -79,17 +80,17 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                     formData.append(`includedPlaces[${index}]`, place);
                 });
             } else if (key === "tags") {
-                value?.forEach((tag, index) => {
+                value?.split(',').map(tag => tag.trim()).forEach((tag, index) => {
                     formData.append(`tags[${index}]`, tag);
                 });
             } else if (key === "customInclusions") {
                 value?.forEach((customInclusion, index) => {
-                    if (!customInclusions) return;
+                    if (!customInclusion) return;
                     formData.append(`customInclusions[${index}]`, customInclusion);
                 });
             } else if (key === "customExclusions") {
                 value?.forEach((customExclusion, index) => {
-                    if (!customExclusions) return;
+                    if (!customExclusion) return;
                     formData.append(`customExclusions[${index}]`, customExclusion);
                 });
             } else {
@@ -172,7 +173,7 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                 </Form.Item>
 
                 <Form.Item name="overview" label="Overview" rules={[{ required: true, message: 'Overview is required' }]}>
-                    <TextArea placeholder="Enter Ovrview" />
+                    <TextArea placeholder="Enter Overview" />
                 </Form.Item>
 
                 <Form.Item name="numberOfNights" label="Number of Nights" rules={[{ required: true, message: 'Please enter the number of nights' }]}>
@@ -313,7 +314,7 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                     )}
                 </Form.List> */}
 
-                <Form.List name="itinerary" initialValue={[{ day: 1, title: '', descriptions: [''] }]} className={Styles.itinerary}>
+                <Form.List name="itinerary" initialValue={[{ day: 1, title: '', descriptions: [''] }]} className={Styles.itinerary} rules={[{ required: true, message: 'Itinerary is required' }]}>
                     {(fields, { add, remove }) => (
                         <>
                             <h4>Itinerary</h4>
@@ -462,7 +463,7 @@ const CreateListingForm = ({ show, setShowAddListing }) => {
                 </Form.List>
                 <br />
                 <br />
-                <Form.Item name="files" required={true} label="License Upload" valuePropName="fileList" getValueFromEvent={e => e && e.fileList}>
+                <Form.Item name="files" required={true} rules={[{ required: true, message: "Uplaod images of the listing" }]} label="License Upload" valuePropName="fileList" getValueFromEvent={e => e && e.fileList}>
                     <Upload name="file" beforeUpload={() => false}>
                         <Button icon={<UploadOutlined />}>Upload File</Button>
                     </Upload>
